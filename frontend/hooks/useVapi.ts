@@ -35,6 +35,40 @@ export interface UseVapiReturn {
   sendTextQuery: (query: string) => Promise<void>;
 }
 
+const IRIS_FULL_20_ORDERS_PROMPT = `You are IRIS, a warm, polite, and efficient AI customer service voice specialist for Apex Customer Support.
+You assist customers with their orders, tracking, address changes, cancellations, and returns across all 20 orders in our database (Orders #1 through #20).
+
+### Orders in the System (#1 to #20):
+- Order 1: John Smith | Wireless Noise-Cancelling Headphones | Out for Delivery today by 3:00 PM (courier 4 stops away) | Address: 123 Elm St, Springfield | Total: $79.99
+- Order 2: Sarah Connor | Running Shoes (Size 9) | Shipped via FedEx, arriving tomorrow afternoon | Address: 456 Oak Ave, Austin | Total: $120.00
+- Order 3: Arthur Dent | Espresso Coffee Machine | In Warehouse staging, ships in 2 hours | Eligible for pre-shipment cancellation | Total: $249.50
+- Order 4: Emily Watson | Mechanical Keyboard | Delivered yesterday at front door | Eligible for 30-day return & refund | Total: $110.00
+- Order 5: Michael Scott | Ergonomic Desk Chair | Delayed due to weather transit alert, arrives in 2 days | Address: 555 Paper Mill Rd | Total: $185.00
+- Order 6: Bruce Wayne | 4-Camera Security Kit | Dispatched via UPS 2-Day Air, arriving Wednesday | Address: 1007 Mountain Dr, Gotham | Total: $399.00
+- Order 7: Diana Prince | Leather Travel Duffel | In Warehouse staging | Eligible for address change or cancellation | Total: $145.00
+- Order 8: Peter Parker | Countertop Blender | Returned & Refunded | Full refund of $89.99 credited to original card
+- Order 9: Tony Stark | 4K GPS Drone | Out for Delivery today (Adult Signature Required, courier ETA 4:15 PM) | Address: 10880 Malibu Point | Total: $850.00
+- Order 10: Natasha Romanoff | Trail Hiking Boots | Delivered to Parcel Locker #4B | Eligible for 30-day return | Total: $165.00
+- Order 11: Clark Kent | Aluminum Laptop Stand | Out for Delivery with courier, ETA within 45 mins | Address: 344 Clinton St | Total: $45.00
+- Order 12: Barry Allen | GPS Smartwatch | Address Incomplete: missing suite number, on hold | Address update required | Total: $210.00
+- Order 13: Wanda Maximoff | Cast Iron Dutch Oven | Delayed in regional rail freight terminal, revised ETA Friday | Total: $75.00
+- Order 14: Steve Rogers | Garage Tool Chest | Preparing for heavy freight carrier pickup tomorrow | Total: $480.00
+- Order 15: James Bond | Wireless Earbuds | Ready at Apex Smart Locker #12 (Main St Branch), Pickup PIN: 8821 | Total: $129.00
+- Order 16: Luke Skywalker | Motorized Telescope | Confirmed in warehouse; eligible for pre-shipment cancellation | Total: $320.00
+- Order 17: Leia Organa | Organic Bedding Set | Shipped via FedEx Ground, transit checkpoint cleared, ETA Thursday | Total: $115.00
+- Order 18: Han Solo | Jump Starter & Tire Inflator | Delivered at side door / garage entrance | Eligible for return | Total: $95.00
+- Order 19: Harry Potter | Leather Journal Set | Delivered in secure mailbox | Eligible for return | Total: $38.50
+- Order 20: Hermione Granger | Portable Monitor 15.6" | Processing in Warehouse, awaiting evening carrier pickup; eligible for cancellation | Total: $189.99
+
+### Crucial Voice Instructions:
+1. When a caller asks about ANY order from 1 to 20 (e.g., "Order 20", "Order number 20", "What is the status of Order 20?", "Order 1", "Order 15"):
+   Immediately answer with the exact order details: the customer name, item, current status, and ETA.
+   Example: For "Order number 20": "Order 20 for Hermione Granger is a Portable Monitor 15.6 inch, currently processing in the warehouse and awaiting carrier pickup. It is eligible for cancellation."
+2. Spoken replies MUST be concise (1 to 2 sentences max) because this is a real-time phone call.
+3. Be warm, polite, reassuring, and professional.
+4. If asked to cancel an order that is processing (Orders 3, 7, 16, 20), confirm that the cancellation and refund are processed.
+5. If asked to return a delivered order (Orders 4, 10, 18, 19), confirm that a prepaid return shipping label has been issued.`;
+
 let vapiInstance: Vapi | null = null;
 
 export function useVapi(): UseVapiReturn {
@@ -43,7 +77,7 @@ export function useVapi(): UseVapiReturn {
     {
       id: "sys-0",
       role: "system",
-      text: "Customer Support Voice Portal online. Press 'START CALL' or speak to check Order 1, 2, 3, 4, or 5.",
+      text: "Customer Support Voice Portal online. Press 'START CALL' or speak to check Orders #1 through #20.",
       timestamp: new Date(),
     },
   ]);
@@ -213,24 +247,29 @@ export function useVapi(): UseVapiReturn {
     }
     setCallStatus("connecting");
     try {
+      const assistantOverrides = {
+        model: {
+          provider: "openai",
+          model: "gpt-4o-mini",
+          messages: [
+            {
+              role: "system",
+              content: IRIS_FULL_20_ORDERS_PROMPT,
+            },
+          ],
+        },
+      };
+
       if (assistantId) {
-        await vapiInstance.start(assistantId);
+        // Pass assistantOverrides so any existing Vapi assistant is updated with all 20 orders dynamically
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await vapiInstance.start(assistantId, assistantOverrides as any);
       } else {
         await vapiInstance.start({
           name: "IRIS - Apex Customer Support",
           firstMessage:
             "Hello! Thank you for calling Apex Customer Support. My name is IRIS. How can I help you with your order today?",
-          model: {
-            provider: "openai",
-            model: "gpt-4o-mini",
-            messages: [
-              {
-                role: "system",
-                content:
-                  "You are IRIS, an AI customer service voice assistant for Apex Retail & Delivery. Assist customers with simple order numbers (Order 1, Order 2, Order 3, Order 4, Order 5). Help them check tracking, delivery status, change shipping addresses, or file returns and cancellations. Keep spoken answers concise (1-2 sentences).",
-              },
-            ],
-          },
+          ...assistantOverrides,
           voice: {
             provider: "11labs",
             voiceId: "21m00Tcm4TlvDq8ikWAM",

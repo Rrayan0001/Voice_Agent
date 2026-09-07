@@ -75,7 +75,7 @@ async def get_config():
         "scenario": {
             "title": "Apex Customer Service & Orders",
             "agent_name": "IRIS - Voice Specialist",
-            "description": "24/7 AI Customer Support for Orders 1, 2, 3, 4, 5"
+            "description": "24/7 AI Customer Support for Orders 1 through 20"
         }
     }
 

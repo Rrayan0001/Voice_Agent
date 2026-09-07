@@ -40,8 +40,21 @@ export async function POST(req: Request) {
       }
     }
 
+    // Normalize word numbers to digits
+    const wordMap: Record<string, string> = {
+      one: "1", two: "2", three: "3", four: "4", five: "5",
+      six: "6", seven: "7", eight: "8", nine: "9", ten: "10",
+      eleven: "11", twelve: "12", thirteen: "13", fourteen: "14", fifteen: "15",
+      sixteen: "16", seventeen: "17", eighteen: "18", nineteen: "19", twenty: "20"
+    };
+
+    let normalizedQuery = queryLower;
+    for (const [word, digit] of Object.entries(wordMap)) {
+      normalizedQuery = normalizedQuery.replace(new RegExp(`\\b${word}\\b`, "g"), digit);
+    }
+
     // Direct simulation fallback
-    const match = queryLower.match(/\b(?:order\s*#?|#)?([1-9]|1[0-9]|20)\b/);
+    const match = normalizedQuery.match(/\b(?:order\s*#?|#)?([1-9]|1[0-9]|20)\b/);
     const orderId = match ? match[1] : null;
     const found = ALL_20_ORDERS.find((o) => o.id === orderId);
 
