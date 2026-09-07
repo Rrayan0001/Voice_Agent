@@ -105,12 +105,14 @@ export function useVapi(): UseVapiReturn {
     setTranscript((prev) => [...prev, newEntry]);
   }, []);
 
-  // Load config from Python backend
+  // Load config from backend
   useEffect(() => {
     api.getConfig().then((cfg) => {
       setPublicKey(cfg.public_key || "");
       setAssistantId(cfg.assistant_id || "");
-    }).catch(console.error);
+    }).catch((err) => {
+      console.warn("Notice: Initial config auto-load used fallback:", err?.message || err);
+    });
   }, []);
 
   function attachEvents(vapi: Vapi) {
