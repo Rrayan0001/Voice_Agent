@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>IRIS // AI Voice Assistant (Vapi.ai)</title>
+  <meta name="description" content="AI Customer Service Voice Assistant with real-time ChatGPT / Gemini Live voice interface powered by Vapi.ai and Python.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+  <!-- Vapi Web SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@vapi-ai/web@2.1.2/dist/vapi.umd.js"></script>
+</head>
+<body class="theme-gemini">
+  <!-- Ambient Gradient Background Glow -->
+  <div class="ambient-glow glow-top"></div>
+  <div class="ambient-glow glow-center"></div>
+
+  <div class="app-container">
+    <!-- Sleek Top Header -->
+    <header class="top-nav">
+      <div class="nav-brand">
+        <div class="voice-badge">
+          <span class="pulse-dot"></span>
+          <span class="badge-text">LIVE VOICE</span>
+        </div>
+        <div class="assistant-meta">
+          <h1 class="assistant-name">IRIS</h1>
+          <span class="assistant-scenario">Chronos Customer Service &bull; Unit 70-B</span>
+        </div>
+      </div>
+
+      <div class="nav-actions">
+        <button id="btnOpenScenario" class="pill-btn glass" title="View Scenario &amp; Test Prompts">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          <span>Scenario &amp; Prompts</span>
+        </button>
+
+        <button id="btnOpenBusiness" class="pill-btn glass" title="Business ROI &amp; Applications">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"></path><path d="M18 20V4"></path><path d="M6 20v-4"></path></svg>
+          <span>Business ROI</span>
+        </button>
+
+        <button id="btnOpenSettings" class="icon-btn glass" title="API Keys &amp; Settings">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- CENTERPIECE: Fluid Voice Orb & Live Captions (ChatGPT / Gemini Live Style) -->
+    <main class="voice-main">
+      <div class="orb-container">
+        <canvas id="fluidOrbCanvas" width="460" height="460"></canvas>
+        <div class="orb-aura"></div>
+      </div>
+
+      <!-- Live Dynamic Status Pill -->
+      <div class="status-pill" id="statusPill">
+        <span class="status-indicator"></span>
+        <span id="statusText">Tap microphone to start voice chat</span>
+      </div>
+
+      <!-- Live Subtitles / Dynamic Captions -->
+      <div class="captions-wrapper">
+        <div class="caption-bubble" id="captionBubble">
+          <p id="captionText">"Hi! I'm IRIS, your customer service voice agent. Press the button below to start talking."</p>
+        </div>
+        <div class="tool-toast" id="toolToast">
+          <span class="tool-icon">⚡</span>
+          <span id="toolToastText">Invoking Python tool...</span>
+        </div>
+      </div>
+    </main>
+
+    <!-- FLOATING BOTTOM DOCK CONTROLS (ChatGPT / Gemini Style) -->
+    <footer class="bottom-dock">
+      <div class="dock-container glass">
+        
+        <!-- Toggle Transcript Drawer -->
+        <button id="btnToggleTranscript" class="dock-btn secondary" title="View Transcript &amp; Tool Logs">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          <span class="unread-dot" id="unreadTranscriptDot"></span>
+        </button>
+
+        <!-- Mute/Unmute Mic -->
+        <button id="btnMuteMic" class="dock-btn secondary" disabled title="Mute Microphone">
+          <svg id="iconMicOn" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+          <svg id="iconMicOff" class="hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="1" y1="1" x2="23" y2="23"></line><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"></path><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2a7 7 0 0 1-.11 1.23"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+        </button>
+
+        <!-- MAIN VOICE BUTTON: Pulsing Call / Hangup -->
+        <button id="btnMainCall" class="dock-btn primary-voice state-idle" title="Start Live Voice Chat">
+          <div class="voice-button-ripple"></div>
+          <svg id="iconCallStart" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+          <svg id="iconCallEnd" class="hidden" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+
+        <!-- Simulator Mode Toggle -->
+        <button id="btnToggleSimulator" class="dock-btn secondary" title="Toggle Simulation / Testing Mode">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+        </button>
+
+        <!-- Quick Query Launcher -->
+        <button id="btnQuickPrompt" class="dock-btn secondary" title="Quick Sample Prompts">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+        </button>
+
+      </div>
+    </footer>
+  </div>
+
+  <!-- SLIDE-OVER DRAWER 1: Live Transcripts & Python Tool Calls -->
+  <div class="drawer-overlay" id="transcriptDrawerOverlay"></div>
+  <aside class="drawer drawer-right" id="transcriptDrawer">
+    <div class="drawer-header">
+      <div class="drawer-title-group">
+        <h3>Live Conversation &amp; Tools</h3>
+        <span class="drawer-sub">Real-time transcripts &amp; Python tool calls</span>
+      </div>
+      <button class="icon-btn-subtle" id="btnCloseTranscriptDrawer">&times;</button>
+    </div>
+
+    <div class="drawer-body">
+      <div class="transcript-feed" id="transcriptFeed">
+        <div class="msg-bubble system">
+          <span class="msg-author">CHRONOS GATEWAY</span>
+          <p>Voice session ready. Start voice call or pick a scenario prompt to begin.</p>
+        </div>
+      </div>
+
+      <!-- Quick Message Input within Drawer -->
+      <form id="drawerChatForm" class="drawer-input-bar">
+        <input type="text" id="drawerChatInput" placeholder="Ask IRIS or type query..." autocomplete="off">
+        <button type="submit" class="send-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  <!-- SLIDE-OVER DRAWER 2: Scenario & Click-to-Test Prompts -->
+  <div class="drawer-overlay" id="scenarioDrawerOverlay"></div>
+  <aside class="drawer drawer-right" id="scenarioDrawer">
+    <div class="drawer-header">
+      <div class="drawer-title-group">
+        <h3>Customer Service Scenario</h3>
+        <span class="drawer-sub">Chronos Temporal Logistics &amp; Paradox Management</span>
+      </div>
+      <button class="icon-btn-subtle" id="btnCloseScenarioDrawer">&times;</button>
+    </div>
+
+    <div class="drawer-body scrollable">
+      <div class="scenario-summary-card">
+        <div class="scenario-tag">FICTIONAL USE CASE</div>
+        <h4>The 24/7 Time-Travel Incident Hotline</h4>
+        <p>
+          Recreational time travelers routinely cause quantum anomalies—misplacing dinosaurs in modern suburbs, 
+          leaving synthesizers in 1816 Geneva, or getting stranded in Victorian London without flux capacitors.
+        </p>
+        <p>
+          <strong>IRIS</strong> (Unit 70-B) triages customer emergencies, queries stability indexes, and triggers real-time 
+          Python backend actions to dispatch retrieval drones.
+        </p>
+      </div>
+
+      <h4 class="section-heading">TRY THESE SAMPLE QUERIES</h4>
+      <p class="section-sub">Tap any query to send it directly to IRIS and watch the Python backend execute:</p>
+
+      <div class="prompts-list">
+        <button class="prompt-chip-card" data-query="Can you check the status of temporal paradox incident PRX-774?">
+          <div class="chip-top">
+            <span class="badge blue">STATUS LOOKUP</span>
+            <span class="fn-name">check_paradox_status</span>
+          </div>
+          <strong>"Check incident PRX-774"</strong>
+          <p>Apatosaurus pet adopted without Mesozoic license in 1987 garage.</p>
+        </button>
+
+        <button class="prompt-chip-card" data-query="Emergency! I am visiting 1888 Victorian London and my flux capacitor cracked. Please file an urgent retrieval claim!">
+          <div class="chip-top">
+            <span class="badge orange">EMERGENCY CLAIM</span>
+            <span class="fn-name">file_temporal_claim</span>
+          </div>
+          <strong>"File claim: Stranded in 1888 London"</strong>
+          <p>Files an emergency extraction claim and generates a unique claim ID.</p>
+        </button>
+
+        <button class="prompt-chip-card" data-query="I hold quantum ticket TCK-882 to Woodstock 1969, but I want to reschedule my departure portal to 2049 AD.">
+          <div class="chip-top">
+            <span class="badge green">PORTAL RESCHEDULE</span>
+            <span class="fn-name">reschedule_quantum_jump</span>
+          </div>
+          <strong>"Reschedule ticket TCK-882 to 2049"</strong>
+          <p>Updates destination coordinates in the quantum ticket database.</p>
+        </button>
+
+        <button class="prompt-chip-card" data-query="What is the historical advisory rating for visiting the year 1348? Is it safe?">
+          <div class="chip-top">
+            <span class="badge purple">ERA ADVISORY</span>
+            <span class="fn-name">query_epoch_advisory</span>
+          </div>
+          <strong>"Check hazard advisory for year 1348"</strong>
+          <p>Queries Black Death bio-zone warnings &amp; protective gear protocols.</p>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- SLIDE-OVER DRAWER 3: Business Benefits & ROI Case Study -->
+  <div class="drawer-overlay" id="businessDrawerOverlay"></div>
+  <aside class="drawer drawer-right" id="businessDrawer">
+    <div class="drawer-header">
+      <div class="drawer-title-group">
+        <h3>Business Benefits &amp; Applications</h3>
+        <span class="drawer-sub">Enterprise voice AI economics &amp; impact</span>
+      </div>
+      <button class="icon-btn-subtle" id="btnCloseBusinessDrawer">&times;</button>
+    </div>
+
+    <div class="drawer-body scrollable">
+      <div class="roi-metric-cards">
+        <div class="metric-card">
+          <span class="metric-number">72%</span>
+          <span class="metric-title">Cost Reduction</span>
+          <p>Lowers cost from $5.00–$8.00 per human agent call to $0.15–$0.25 via Vapi.</p>
+        </div>
+        <div class="metric-card">
+          <span class="metric-number">&lt; 500ms</span>
+          <span class="metric-title">Turn-taking Latency</span>
+          <p>Real-time speech streaming enables natural, responsive interruptions.</p>
+        </div>
+        <div class="metric-card">
+          <span class="metric-number">100%</span>
+          <span class="metric-title">24/7 Availability</span>
+          <p>Handles traffic spikes (flight cancellations, flash sales) with zero queue wait times.</p>
+        </div>
+        <div class="metric-card">
+          <span class="metric-number">88%</span>
+          <span class="metric-title">First-Call Resolution</span>
+          <p>Direct Python tool-calling allows instant database lookups and updates on the call.</p>
+        </div>
+      </div>
+
+      <h4 class="section-heading">REAL-WORLD INDUSTRY USE CASES</h4>
+      <div class="industry-grid">
+        <div class="industry-item">
+          <div class="ind-icon">✈</div>
+          <div>
+            <strong>Airlines &amp; Travel</strong>
+            <p>Flight re-booking, luggage tracking, automated weather credits.</p>
+          </div>
+        </div>
+        <div class="industry-item">
+          <div class="ind-icon">🏥</div>
+          <div>
+            <strong>Healthcare &amp; Clinical</strong>
+            <p>Patient intake triage, appointment scheduling, prescription refills.</p>
+          </div>
+        </div>
+        <div class="industry-item">
+          <div class="ind-icon">💳</div>
+          <div>
+            <strong>Banking &amp; Fintech</strong>
+            <p>Instant card freeze, fraudulent transaction review, wire status.</p>
+          </div>
+        </div>
+        <div class="industry-item">
+          <div class="ind-icon">🚚</div>
+          <div>
+            <strong>Logistics &amp; Fleet</strong>
+            <p>Driver dispatch, missed delivery re-routing, package intake.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MODAL: Settings & Keys -->
+  <div class="modal-overlay" id="settingsModalOverlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Vapi AI Settings &amp; Keys</h3>
+        <button class="icon-btn-subtle" id="btnCloseSettingsModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="settingsForm" class="settings-form">
+          <div class="form-group">
+            <label for="settingPublicKey">Vapi Public Key (Client WebRTC)</label>
+            <input type="text" id="settingPublicKey" placeholder="e.g. a81d1ca1-225f-4c97-..." spellcheck="false">
+          </div>
+          <div class="form-group">
+            <label for="settingPrivateKey">Vapi Private API Key (Server auto-setup)</label>
+            <input type="password" id="settingPrivateKey" placeholder="e.g. 3a1f9e2b-..." spellcheck="false">
+          </div>
+          <div class="form-group">
+            <label for="settingAssistantId">Assistant ID</label>
+            <input type="text" id="settingAssistantId" placeholder="e.g. e596cf19-1893-473c-..." spellcheck="false">
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn primary">Save Credentials</button>
+            <button type="button" class="btn secondary" id="btnSyncAssistant">Sync / Auto-Create in Vapi</button>
+          </div>
+          <div id="settingsFeedback" class="feedback-msg"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
