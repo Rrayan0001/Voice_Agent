@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo } from "react";
 import type { CallStatus, TranscriptEntry } from "@/hooks/useVapi";
+import { useMounted } from "@/hooks/useMounted";
 
 interface Props {
   callStatus: CallStatus;
@@ -33,26 +34,23 @@ export default function CaptionBubble({
   onSetTargetLang,
   onStopSpeaking,
 }: Props) {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const mounted = useMounted();
 
   const isActive = callStatus === "active";
   const isConnecting = callStatus === "connecting";
 
   // Find latest user entry and latest assistant entry
-  const { latestUser, latestAssistant, latestTool } = useMemo(() => {
+  const { latestUser, latestAssistant } = useMemo(() => {
     let u: TranscriptEntry | null = null;
     let a: TranscriptEntry | null = null;
-    let t: TranscriptEntry | null = null;
 
     for (let i = transcript.length - 1; i >= 0; i--) {
       const e = transcript[i];
       if (!u && e.role === "user") u = e;
       if (!a && e.role === "assistant") a = e;
-      if (!t && e.role === "tool") t = e;
       if (u && a) break;
     }
-    return { latestUser: u, latestAssistant: a, latestTool: t };
+    return { latestUser: u, latestAssistant: a };
   }, [transcript]);
 
   const currentUserText = liveRole === "user" ? liveText : latestUser?.text || "";

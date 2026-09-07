@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import type { TranscriptEntry } from "@/hooks/useVapi";
+import { useMounted } from "@/hooks/useMounted";
 
 interface Props {
   transcript: TranscriptEntry[];
@@ -17,12 +18,8 @@ const ROLE_CONFIG: Record<string, { label: string; cls: string; prefix: string }
 
 export default function TranscriptPanel({ transcript, onSendQuery }: Props) {
   const [inputVal, setInputVal] = useState("");
-  const [mounted, setMounted] = useState(false);
+  const mounted = useMounted();
   const feedRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     if (feedRef.current) feedRef.current.scrollTop = feedRef.current.scrollHeight;

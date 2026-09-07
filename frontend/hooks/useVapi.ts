@@ -113,18 +113,6 @@ export function useVapi(): UseVapiReturn {
     }).catch(console.error);
   }, []);
 
-  // Initialize Vapi instance when public key is available
-  useEffect(() => {
-    if (!publicKey) return;
-    if (vapiInstance) return;
-    try {
-      vapiInstance = new Vapi(publicKey);
-      attachEvents(vapiInstance);
-    } catch (e) {
-      console.error("Vapi init error:", e);
-    }
-  }, [publicKey]); // eslint-disable-line react-hooks/exhaustive-deps
-
   function attachEvents(vapi: Vapi) {
     vapi.on("call-start", () => {
       setCallStatus("active");
@@ -198,6 +186,18 @@ export function useVapi(): UseVapiReturn {
       });
     });
   }
+
+  // Initialize Vapi instance when public key is available
+  useEffect(() => {
+    if (!publicKey) return;
+    if (vapiInstance) return;
+    try {
+      vapiInstance = new Vapi(publicKey);
+      attachEvents(vapiInstance);
+    } catch (e) {
+      console.error("Vapi init error:", e);
+    }
+  }, [publicKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const startCall = useCallback(async () => {
     if (!vapiInstance) {
@@ -325,7 +325,7 @@ export function useVapi(): UseVapiReturn {
           utt.onend = () => setAssistantSpeaking(false);
           window.speechSynthesis.speak(utt);
         }
-      } catch (err) {
+      } catch {
         addEntry({ role: "system", text: "Backend service unreachable on port 8000." });
       }
     },

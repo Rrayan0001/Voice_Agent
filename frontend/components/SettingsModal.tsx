@@ -128,7 +128,7 @@ export default function SettingsModal({ isOpen, onClose, onConfigSaved }: Props)
           >
             {[
               <span key={1}>01. Go to <a href="https://vapi.ai" target="_blank" rel="noopener" style={{ color: "var(--color-terra)", textDecoration: "underline" }}>vapi.ai</a> → sign up (free $10 credit)</span>,
-              <span key={2}>02. Click <strong style={{ color: "var(--color-ink)" }}>"API Keys"</strong> in the left sidebar</span>,
+              <span key={2}>02. Click <strong style={{ color: "var(--color-ink)" }}>&ldquo;API Keys&rdquo;</strong> in the left sidebar</span>,
               <span key={3}>03. Copy <strong style={{ color: "var(--color-ink)" }}>Public Key</strong> and <strong style={{ color: "var(--color-ink)" }}>Private API Key</strong></span>,
             ].map((item, i) => (
               <li key={i} className="flex items-start gap-2">

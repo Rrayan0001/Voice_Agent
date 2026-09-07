@@ -126,7 +126,7 @@ export default function HomePage() {
             liveRole={liveRole}
             targetLang={targetLang}
             onSetTargetLang={setTargetLang}
-            onStopSpeaking={endCall}
+            onStopSpeaking={stopSpeaking}
           />
         </div>
 

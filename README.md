@@ -24,27 +24,43 @@
 
 ## 🚀 Quick Start & Setup
 
-### 1. Start the Python FastAPI Backend
+### ⚡ One-Click Startup (All Services)
 ```bash
-cd backend
-uv run --with fastapi --with uvicorn --with httpx --with python-dotenv --with pydantic uvicorn main:app --host 0.0.0.0 --port 8000
+./run.sh
 ```
-Backend runs on: `http://localhost:8000`
-
-### 2. Start the Next.js Frontend
-```bash
-cd frontend
-npm run dev
-```
-Frontend runs on:
-- Local: `http://localhost:3000`
-- Mobile / Local WiFi: `http://192.168.1.7:3000` (or your machine's local IP)
+This automatically boots both the FastAPI backend (`:8000`) and the Next.js frontend (`:3000`).
 
 ---
 
-## 🔑 Connecting Your Free Vapi AI Key
+### Manual Individual Startup
 
-1. Sign up for free at [https://vapi.ai/](https://vapi.ai/) (includes **$10 free credits**, ~50–100 minutes of voice calls).
+#### 1. Backend Service (FastAPI)
+```bash
+cd backend
+# Install dependencies
+pip install -r requirements.txt
+# Run server
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+```
+API Documentation available at: `http://localhost:8000/docs`
+
+#### 2. Frontend Application (Next.js)
+```bash
+cd frontend
+# Install dependencies
+npm install
+# Run development server
+npm run dev
+```
+Access the portal at:
+- Local browser: `http://localhost:3000`
+- Mobile / Local LAN: `http://<your-local-ip>:3000`
+
+---
+
+## 🔑 Connecting Your Vapi AI Key
+
+1. Sign up at [https://vapi.ai/](https://vapi.ai/) (includes **$10 free credits**, ~50–100 minutes of voice calls).
 2. Go to **"API Keys"** in your Vapi dashboard.
 3. Copy:
    - **Public Key** (used by browser for WebRTC voice stream).
@@ -65,29 +81,41 @@ A complete test matrix with voice prompts and expected assistant responses for a
 
 ```
 voiceagent/
-├── backend/
+├── run.sh                   # One-click startup script for frontend & backend
+├── teammate_testing_guide.md# 20-scenario testing reference for team testing
+├── README.md                # Project documentation
+├── .env.example             # Global environment template
+├── .gitignore               # Comprehensive gitignore (secrets, node_modules, caches)
+│
+├── backend/                 # 🐍 Python FastAPI Backend
 │   ├── main.py              # FastAPI server, CORS middleware, webhooks & translation
 │   ├── order_service.py     # 20 customer order database, tracking, returns & cancellations
 │   ├── vapi_manager.py      # Vapi assistant auto-provisioning & system prompt
-│   └── requirements.txt
-├── frontend/
-│   ├── app/
-│   │   ├── globals.css      # Retro × Claude light styling & design tokens
-│   │   ├── layout.tsx       # Fonts, mobile viewport & hydration configuration
-│   │   └── page.tsx         # Main customer portal, orb & layout
-│   ├── components/
-│   │   ├── BottomDock.tsx   # Touch-friendly dock with permanent START & STOP buttons
-│   │   ├── CaptionBubble.tsx# Live dialogue console, speech wave & translation
-│   │   ├── Drawer.tsx       # Mobile-responsive slide-over drawers
-│   │   ├── ScenarioPanel.tsx# 20-order interactive directory with copy test prompts
-│   │   ├── SettingsModal.tsx# 1-click Vapi provisioning modal
-│   │   ├── TopNav.tsx       # Responsive mobile navigation header
-│   │   ├── TranscriptPanel.tsx # Chat log with timestamps & receipts
-│   │   └── VoiceOrb.tsx     # Fluid voice canvas animation
-│   ├── hooks/
-│   │   ├── useVapi.ts       # WebRTC voice link, live transcription & translation
-│   │   └── useVoiceOrb.ts   # Audio reactive fluid orb engine
-│   └── next.config.ts       # Reverse proxy rewrites & CORS headers
-├── teammate_testing_guide.md# 20-scenario testing reference for team testing
-└── README.md
+│   ├── requirements.txt     # Python backend dependencies
+│   ├── .env.example         # Backend environment variables template
+│   └── README.md            # Backend documentation & endpoints
+│
+└── frontend/                # ⚛️ Next.js 15 (React 19) Frontend
+    ├── app/
+    │   ├── globals.css      # Retro × Claude light styling & design tokens
+    │   ├── layout.tsx       # Viewport, fonts & hydration configuration
+    │   └── page.tsx         # Main customer portal & state coordinator
+    ├── components/
+    │   ├── BottomDock.tsx   # Touch-friendly dock with permanent START & STOP buttons
+    │   ├── CaptionBubble.tsx# Live dialogue console, speech wave & translation
+    │   ├── Drawer.tsx       # Slide-over drawers for scenarios & transcripts
+    │   ├── ScenarioPanel.tsx# 20-order interactive directory with copy test prompts
+    │   ├── SettingsModal.tsx# 1-click Vapi provisioning modal
+    │   ├── TopNav.tsx       # Header with status pills, visualizer & shortcuts
+    │   ├── TranscriptPanel.tsx # Chat log with timestamps & receipts
+    │   └── VoiceOrb.tsx     # Fluid voice canvas animation
+    ├── hooks/
+    │   └── useVapi.ts       # WebRTC voice link, live transcription & translation
+    ├── lib/
+    │   └── vapiClient.ts    # Vapi Web SDK client singleton
+    ├── next.config.ts       # Reverse proxy rewrites & CORS headers
+    ├── package.json         # Frontend dependencies & scripts
+    ├── tsconfig.json        # TypeScript configuration
+    ├── .env.example         # Frontend environment template
+    └── README.md            # Frontend documentation
 ```
