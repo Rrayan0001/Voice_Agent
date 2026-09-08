@@ -249,20 +249,20 @@ export function useVapi(): UseVapiReturn {
     try {
       const assistantOverrides = {
         model: {
-          provider: "openai",
+          provider: "openai" as const,
           model: "gpt-4o-mini",
           messages: [
             {
-              role: "system",
+              role: "system" as const,
               content: IRIS_FULL_20_ORDERS_PROMPT,
             },
           ],
         },
       };
 
+      /* eslint-disable @typescript-eslint/no-explicit-any */
       if (assistantId) {
         // Pass assistantOverrides so any existing Vapi assistant is updated with all 20 orders dynamically
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         await vapiInstance.start(assistantId, assistantOverrides as any);
       } else {
         await vapiInstance.start({
@@ -274,8 +274,9 @@ export function useVapi(): UseVapiReturn {
             provider: "11labs",
             voiceId: "21m00Tcm4TlvDq8ikWAM",
           },
-        });
+        } as any);
       }
+      /* eslint-enable @typescript-eslint/no-explicit-any */
     } catch (err: unknown) {
       console.warn("Vapi start encountered issue, operating in Web Voice mode:", err);
       setCallStatus("active");
